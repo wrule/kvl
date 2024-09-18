@@ -21,15 +21,15 @@ class KVL {
   private db: Database;
 
   public set(key: string, value: string) {
-    const insertStmt = this.db.prepare(`INSERT OR IGNORE INTO ttkv (createTime, updateTime, key, value) VALUES (?, ?, ?, ?)`);
-    const updateStmt = this.db.prepare(`UPDATE ttkv SET value = ?, updateTime = ? WHERE key = ?`);
+    const insertStmt = this.db.prepare(`INSERT OR IGNORE INTO kvl (createTime, updateTime, key, value) VALUES (?, ?, ?, ?)`);
+    const updateStmt = this.db.prepare(`UPDATE kvl SET value = ?, updateTime = ? WHERE key = ?`);
     const time = Date.now();
     insertStmt.run(time, time, key, value);
     updateStmt.run(value, time, key);
   }
 
   public get(key: string) {
-    const selectStmt = this.db.prepare(`SELECT value FROM ttkv WHERE key = ?`);
+    const selectStmt = this.db.prepare(`SELECT value FROM kvl WHERE key = ?`);
     const item = selectStmt.get(key) as { value: string } | undefined;
     return item?.value;
   }
@@ -41,29 +41,29 @@ class KVL {
   }
 
   public pop(name: string) {
-    const selectStmt = this.db.prepare(`SELECT value, id FROM ttkv WHERE key LIKE ? || ':%' ORDER BY id DESC LIMIT 1`);
-    const deleteStmt = this.db.prepare(`DELETE FROM ttkv WHERE id = ?`);
+    const selectStmt = this.db.prepare(`SELECT value, id FROM kvl WHERE key LIKE ? || ':%' ORDER BY id DESC LIMIT 1`);
+    const deleteStmt = this.db.prepare(`DELETE FROM kvl WHERE id = ?`);
     const item = selectStmt.get(name) as { value: string, id: number } | undefined;
     if (item?.id) deleteStmt.run(item.id);
     return item?.value;
   }
 
   public shift(name: string) {
-    const selectStmt = this.db.prepare(`SELECT value, id FROM ttkv WHERE key LIKE ? || ':%' ORDER BY id ASC LIMIT 1`);
-    const deleteStmt = this.db.prepare(`DELETE FROM ttkv WHERE id = ?`);
+    const selectStmt = this.db.prepare(`SELECT value, id FROM kvl WHERE key LIKE ? || ':%' ORDER BY id ASC LIMIT 1`);
+    const deleteStmt = this.db.prepare(`DELETE FROM kvl WHERE id = ?`);
     const item = selectStmt.get(name) as { value: string, id: number } | undefined;
     if (item?.id) deleteStmt.run(item.id);
     return item?.value;
   }
 
   public all(name: string) {
-    const selectStmt = this.db.prepare(`SELECT createTime, updateTime, key, value FROM ttkv WHERE key LIKE ? || ':%' ORDER BY createTime DESC`);
+    const selectStmt = this.db.prepare(`SELECT createTime, updateTime, key, value FROM kvl WHERE key LIKE ? || ':%' ORDER BY createTime DESC`);
     return selectStmt.all(name) as { createTime: number, updateTime: number, key: string, value: string }[];
   }
 
   public expire() {
     if (!this.expireTimeMs) return;
-    const deleteStmt = this.db.prepare(`DELETE FROM ttkv WHERE updateTime <= ?`);
+    const deleteStmt = this.db.prepare(`DELETE FROM kvl WHERE updateTime <= ?`);
     const result = deleteStmt.run(Date.now() - this.expireTimeMs);
     if (result.changes > 0) this.db.exec('VACUUM');
   }
