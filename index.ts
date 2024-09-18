@@ -62,6 +62,18 @@ class KVL {
     return selectStmt.all(name) as { createTime: number, updateTime: number, key: string, value: string }[];
   }
 
+  public tags(key: string) {
+
+  }
+
+  public tag(key: string, tag: string) {
+
+  }
+
+  public untag(key: string, tag: string) {
+
+  }
+
   public expire() {
     if (!this.expireTimeMs) return;
     const deleteStmt = this.db.prepare(`DELETE FROM kvl WHERE updateTime <= ?`);
