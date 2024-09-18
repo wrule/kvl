@@ -78,12 +78,9 @@ class KVL {
 }
 
 async function main() {
-  const db = new TTKV('4.db', 60000);
-  let count = 1;
-  setInterval(() => {
-    // console.log(count);
-    db.push('test', (count++).toString());
-  }, 0);
+  const db = new KVL('2.db');
+  db.set('jimao', 'nihao');
+  console.log(db.get('jimao'));
 }
 
 main();
