@@ -26,6 +26,7 @@ class KVL {
     const time = Date.now();
     insertStmt.run(time, time, key, value);
     updateStmt.run(value, time, key);
+    return this;
   }
 
   public get(key: string) {
