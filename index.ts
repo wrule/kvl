@@ -78,6 +78,18 @@ class KVL {
     }
   }
 
+  public page(
+    name: string,
+    pageNum = 1,
+    pageSize = 10,
+    tags?: string[],
+    tagsOperator?: 'AND' | 'OR',
+    orderBy?: 'createTime' | 'updateTime',
+    orderDir?: 'ASC' | 'DESC',
+  ) {
+
+  }
+
   public expire() {
     if (!this.expireTimeMs) return;
     const deleteStmt = this.db.prepare(`DELETE FROM kvl WHERE updateTime <= ?`);
@@ -96,8 +108,8 @@ class KVL {
 
 async function main() {
   const db = new KVL('2.db');
-  db.tags('num', '1,2,3');
-  console.log(db.tags('num'));
+  db.tags('jimao', '1,2,3');
+  console.log(db.tags('jimao'));
 }
 
 main();
