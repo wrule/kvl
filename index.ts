@@ -62,16 +62,18 @@ class KVL {
     return selectStmt.all(name) as { createTime: number, updateTime: number, key: string, value: string }[];
   }
 
-  public tags(key: string) {
-
-  }
-
-  public tag(key: string, tag: string) {
-
-  }
-
-  public untag(key: string, tag: string) {
-
+  public tags(key: string): string | undefined;
+  public tags(key: string, tags: string): void;
+  public tags(key: string, tags?: string) {
+    if (tags == null) {
+      const selectStmt = this.db.prepare(`SELECT labels FROM kvl WHERE key = ?`);
+      const item = selectStmt.get(key) as { labels: string } | undefined;
+      return item?.labels;
+    } else {
+      const updateStmt = this.db.prepare(`UPDATE kvl SET labels = ?, updateTime = ? WHERE key = ?`);
+      const time = Date.now();
+      updateStmt.run(tags, time, key);
+    }
   }
 
   public expire() {
