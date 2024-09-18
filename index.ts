@@ -4,7 +4,7 @@ import sqlite3, { Database } from 'better-sqlite3';
 import makeDB from './makeDB';
 
 export default
-class TTKV {
+class KVL {
   public constructor(
     private file: string,
     private expireTimeMs?: number,
