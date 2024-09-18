@@ -72,7 +72,8 @@ class KVL {
     } else {
       const updateStmt = this.db.prepare(`UPDATE kvl SET labels = ?, updateTime = ? WHERE key = ?`);
       const time = Date.now();
-      updateStmt.run(tags, time, key);
+      const result = updateStmt.run(tags, time, key);
+      if (result.changes < 1) throw Error('item does not exist');
     }
   }
 
@@ -94,8 +95,8 @@ class KVL {
 
 async function main() {
   const db = new KVL('2.db');
-  db.set('jimao', 'nihao');
-  console.log(db.get('jimao'));
+  db.tags('num', '1,2,3');
+  console.log(db.tags('num'));
 }
 
 main();
