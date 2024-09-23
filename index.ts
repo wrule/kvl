@@ -87,6 +87,9 @@ class KVL {
     orderBy?: 'createTime' | 'updateTime',
     orderDir?: 'ASC' | 'DESC',
   ) {
+    if (pageNum < 1) pageNum = 1;
+    if (pageSize < 1) pageSize = 10;
+
     const selectSQL = (param: '*' | 'COUNT(1) as total') => {
       return `SELECT ${param} FROM kvl WHERE key LIKE ? || ':%' AND (${(() => {
         if (!tags?.length) return '1 = 1';
