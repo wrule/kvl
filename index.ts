@@ -87,7 +87,17 @@ class KVL {
     orderBy?: 'createTime' | 'updateTime',
     orderDir?: 'ASC' | 'DESC',
   ) {
-
+    const selectStmt = (param: '*' | 'COUNT(1) as total') => {
+      return `SELECT ${param} FROM kvl WHERE key LIKE ? || ':%' AND (${(() => {
+        if (!tags?.length) return '1 = 1';
+        return Array(tags.length).fill(`labels LIKE ('%' || ? || '%')`).join(` ${tagsOperator ?? 'AND'} `);
+      })()})`;
+    };
+    const totalStmt = this.db.prepare(selectStmt('COUNT(1) as total'));
+    const { total } = totalStmt.get(name) as { total: number };
+    const lastOffset = total > 0 ? total - 1 : 0;
+    const pages = Math.floor(lastOffset / pageSize) + 1;
+    if (pageNum > pages) pageNum = pages;
   }
 
   public expire() {
@@ -108,8 +118,7 @@ class KVL {
 
 async function main() {
   const db = new KVL('2.db');
-  db.tags('jimao', '1,2,3');
-  console.log(db.tags('jimao'));
+  db.page('test');
 }
 
 main();
