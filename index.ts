@@ -98,6 +98,15 @@ class KVL {
     const lastOffset = total > 0 ? total - 1 : 0;
     const pages = Math.floor(lastOffset / pageSize) + 1;
     if (pageNum > pages) pageNum = pages;
+    const limit = pageSize;
+    const offset = (pageNum - 1) * pageSize;
+
+    const pageStmt = selectStmt('*') + `${(() => {
+      if (!orderBy) return '';
+      if (!orderDir) orderDir = 'DESC';
+      return ` ORDER BY ${orderBy} ${orderDir}`;
+    })()} LIMIT ${limit} OFFSET ${offset}`;
+    console.log(pageStmt);
   }
 
   public expire() {
@@ -118,7 +127,7 @@ class KVL {
 
 async function main() {
   const db = new KVL('2.db');
-  db.page('test');
+  db.page('test', 1, 3, [], 'AND', 'createTime', 'ASC');
 }
 
 main();
