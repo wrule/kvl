@@ -94,18 +94,18 @@ class KVL {
       })()})`;
     };
     const totalStmt = this.db.prepare(selectSQL('COUNT(1) as total'));
-    const { total } = totalStmt.get(name) as { total: number };
+    const { total } = totalStmt.get(name, ...(tags ?? [])) as { total: number };
     const lastOffset = total > 0 ? total - 1 : 0;
     const pages = Math.floor(lastOffset / pageSize) + 1;
     if (pageNum > pages) pageNum = pages;
     const limit = pageSize;
     const offset = (pageNum - 1) * pageSize;
 
-    const pageStmt = selectSQL('*') + `${(() => {
+    const pageStmt = this.db.prepare(selectSQL('*') + `${(() => {
       if (!orderBy) return '';
       if (!orderDir) orderDir = 'DESC';
       return ` ORDER BY ${orderBy} ${orderDir}`;
-    })()} LIMIT ${limit} OFFSET ${offset}`;
+    })()} LIMIT ${limit} OFFSET ${offset}`);
     console.log(pageStmt);
   }
 
