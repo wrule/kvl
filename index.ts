@@ -106,7 +106,11 @@ class KVL {
       if (!orderDir) orderDir = 'DESC';
       return ` ORDER BY ${orderBy} ${orderDir}`;
     })()} LIMIT ${limit} OFFSET ${offset}`);
-    console.log(pageStmt);
+
+    const list = pageStmt.all(name, ...(tags ?? [])) as any[];
+    list.forEach((item, index) => item.index = offset + index);
+
+    return { pageNum, pageSize, total, pages, list };
   }
 
   public expire() {
