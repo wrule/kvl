@@ -131,7 +131,7 @@ class KVL {
 
 async function main() {
   const db = new KVL('2.db');
-  db.page('test', 1, 3, [], 'AND', 'createTime', 'ASC');
+  console.log(db.page('test', 1, 10, [], 'OR', 'createTime', 'ASC'));
 }
 
 main();
