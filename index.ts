@@ -96,6 +96,7 @@ class KVL {
         return Array(tags.length).fill(`labels LIKE ('%' || ? || '%')`).join(` ${tagsOperator ?? 'AND'} `);
       })()})`;
     };
+
     const totalStmt = this.db.prepare(selectSQL('COUNT(1) as total'));
     const { total } = totalStmt.get(name, ...(tags ?? [])) as { total: number };
     const pages = Math.floor((total - 1) / pageSize) + 1;
