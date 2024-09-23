@@ -87,13 +87,13 @@ class KVL {
     orderBy?: 'createTime' | 'updateTime',
     orderDir?: 'ASC' | 'DESC',
   ) {
-    const selectStmt = (param: '*' | 'COUNT(1) as total') => {
+    const selectSQL = (param: '*' | 'COUNT(1) as total') => {
       return `SELECT ${param} FROM kvl WHERE key LIKE ? || ':%' AND (${(() => {
         if (!tags?.length) return '1 = 1';
         return Array(tags.length).fill(`labels LIKE ('%' || ? || '%')`).join(` ${tagsOperator ?? 'AND'} `);
       })()})`;
     };
-    const totalStmt = this.db.prepare(selectStmt('COUNT(1) as total'));
+    const totalStmt = this.db.prepare(selectSQL('COUNT(1) as total'));
     const { total } = totalStmt.get(name) as { total: number };
     const lastOffset = total > 0 ? total - 1 : 0;
     const pages = Math.floor(lastOffset / pageSize) + 1;
@@ -101,7 +101,7 @@ class KVL {
     const limit = pageSize;
     const offset = (pageNum - 1) * pageSize;
 
-    const pageStmt = selectStmt('*') + `${(() => {
+    const pageStmt = selectSQL('*') + `${(() => {
       if (!orderBy) return '';
       if (!orderDir) orderDir = 'DESC';
       return ` ORDER BY ${orderBy} ${orderDir}`;
