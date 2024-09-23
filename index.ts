@@ -95,9 +95,8 @@ class KVL {
     };
     const totalStmt = this.db.prepare(selectSQL('COUNT(1) as total'));
     const { total } = totalStmt.get(name, ...(tags ?? [])) as { total: number };
-    const lastOffset = total > 0 ? total - 1 : 0;
-    const pages = Math.floor(lastOffset / pageSize) + 1;
-    if (pageNum > pages) pageNum = pages;
+    const pages = Math.floor((total - 1) / pageSize) + 1;
+    if (pageNum > pages) pageNum = (pages === 0) ? 1 : pages;
     const limit = pageSize;
     const offset = (pageNum - 1) * pageSize;
 
@@ -131,7 +130,7 @@ class KVL {
 
 async function main() {
   const db = new KVL('2.db');
-  console.log(db.page('test', 1, 10, [], 'OR', 'createTime', 'ASC'));
+  console.log(db.page('test', 1, 10, ['sddf'], 'OR', 'createTime', 'ASC'));
 }
 
 main();
